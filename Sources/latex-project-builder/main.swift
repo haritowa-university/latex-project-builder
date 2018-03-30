@@ -9,7 +9,14 @@ import Foundation
 import Basic
 import Utility
 
-//let parser = LatexBuilderArgumentParser()
-//try parser.parse(args: Array(CommandLine.arguments.dropFirst()))
+let parser = LatexBuilderArgumentParser()
+try parser.parse(args: Array(CommandLine.arguments.dropFirst()))
 
-let fileManager = FileManager.default
+let result = try NoteBuilder(fileManager: .default).build(
+    rootDirectory: URL(fileURLWithPath: parser.get(for: .rootDirectory)),
+    sectionsDirectory: parser.get(for: .relativeSectionsDirectory),
+    preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath)
+)
+
+print(result.result)
+print(result.warnings)
