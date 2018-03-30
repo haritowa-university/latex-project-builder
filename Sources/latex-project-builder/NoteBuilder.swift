@@ -23,8 +23,6 @@ struct NoteBuilder {
         let preamblePath = currentDirectory + "/preamble.tex"
         let customizationFilePath = currentDirectory + "/" + customizationFileName
         
-        print("preamblePath: \(preamblePath)")
-        
         guard fileManager.fileExists(atPath: preamblePath) else {
             throw Error.cantFindPreamble
         }

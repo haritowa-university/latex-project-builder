@@ -18,5 +18,12 @@ let result = try NoteBuilder(fileManager: .default).build(
     preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath)
 )
 
-print(result.result)
-print(result.warnings)
+print("Result is located at \(result.result.path)")
+
+if let stdout = stdoutStream as? LocalFileOutputByteStream {
+    let tc = TerminalController(stream: stdout)
+    
+    for warning in result.warnings {
+        tc?.write("[WARNING]: \(warning)", inColor: .yellow)
+    }
+}
