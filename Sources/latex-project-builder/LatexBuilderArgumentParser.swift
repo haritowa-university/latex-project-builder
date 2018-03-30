@@ -82,7 +82,7 @@ final class LatexBuilderArgumentParser {
     }
     
     init() {
-        argumentParser = ArgumentParser(commandName: "build", usage: "build [--rootDirectory tex --relativeSectionsDirectory sections --preambleCustomizationsPath preamble-customization.tex -- additionalInputs: ]", overview: "", seeAlso: nil)
+        argumentParser = ArgumentParser(usage: "[--rootDirectory tex --relativeSectionsDirectory sections --preambleCustomizationsPath preamble-customization.tex -- additionalInputs: ]", overview: "", seeAlso: nil)
         
         rootDirectoryParameter = LatexBuilderArgumentParser.add(argument: .rootDirectory, parser: argumentParser)
         relativeSectionsDirectoryParameter = LatexBuilderArgumentParser.add(argument: .relativeSectionsDirectory, parser: argumentParser)
