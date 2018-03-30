@@ -11,6 +11,7 @@ struct FileBuilder {
     enum Error: Swift.Error {
         case sourceFileNotFound(url: URL)
         case accomodationNotFound(url: URL)
+        case cantCreateFile(url: URL)
     }
     
     private static func generateIncludeCommand(for fileManager: FileManager, url: URL) throws -> String {
@@ -31,8 +32,12 @@ struct FileBuilder {
         let newFileName = sourceFile.deletingPathExtension().lastPathComponent + "-compiled.tex"
         
         let newFilePath = "\(sourceFolder)/\(newFileName)"
-        print(fileManager.createFile(atPath: newFilePath, contents: resultContent.data(using: .utf8), attributes: nil))
+        let resultURL = URL(fileURLWithPath: newFilePath)
         
-        return URL(fileURLWithPath: newFilePath)
+        guard fileManager.createFile(atPath: newFilePath, contents: resultContent.data(using: .utf8), attributes: nil) else {
+            throw Error.cantCreateFile(url: resultURL)
+        }
+        
+        return resultURL
     }
 }
