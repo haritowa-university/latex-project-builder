@@ -15,15 +15,16 @@ try parser.parse(args: Array(CommandLine.arguments.dropFirst()))
 let result = try NoteBuilder(fileManager: .default).build(
     rootDirectory: URL(fileURLWithPath: parser.get(for: .rootDirectory)),
     sectionsDirectory: parser.get(for: .relativeSectionsDirectory),
-    preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath)
+    preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath),
+    additionalInputs: parser.get(for: .additionalInputs)
 )
 
 print("Result is located at \(result.result.path)")
 
 if let stdout = stdoutStream as? LocalFileOutputByteStream {
     let tc = TerminalController(stream: stdout)
-    
+
     for warning in result.warnings {
-        tc?.write("[WARNING]: \(warning)", inColor: .yellow)
+        tc?.write("[WARNING]: \(warning) \n", inColor: .yellow)
     }
 }

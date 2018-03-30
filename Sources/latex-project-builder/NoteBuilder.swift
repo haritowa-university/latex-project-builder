@@ -91,18 +91,39 @@ struct NoteBuilder {
         return FileBuilder.urlToInputMapper(prefix: folderPath, url: url)
     }
     
-    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String) throws -> (result: URL, warnings: [String]) {
+    private func buildAdditionalInputs(rootDirectory: URL, inputs: [String]) -> (result: String, warnings: [String]) {
+        var result = ""
+        var warnings = [String]()
+        
+        for input in inputs {
+            let inputWithExtension = input.hasSuffix(".tex") ? input : input + ".tex"
+            let inputURL = rootDirectory.appendingPathComponent(inputWithExtension)
+            
+            if fileManager.fileExists(atPath: inputURL.path) {
+                result += FileBuilder.urlToInputMapper(for: inputURL) + "\n"
+            } else {
+                warnings.append("Can't find additional file \(inputWithExtension)")
+            }
+        }
+        
+        return (result, warnings)
+    }
+    
+    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String, additionalInputs: [String]) throws -> (result: URL, warnings: [String]) {
         let preamble = try FileBuilder.urlToInputMapper(for: generatePreamble(rootDirectory: rootDirectory, customizationFileName: preambleCustomizationFileName))
         let macros = getMacrosURL(for: rootDirectory).map(FileBuilder.urlToInputMapper) ?? ""
         
         let (sections, sectionsWarnings) = try buildSections(sectionsPath: rootDirectory.appendingPathComponent(sectionsDirectory))
         let sectionsString = sections.map(compilledSectionUrlToInputMapper).reduce("") { "\($0)\n  \($1)" }
         
+        let (inputs, inputsWarnings) = buildAdditionalInputs(rootDirectory: rootDirectory, inputs: additionalInputs)
+        
         let document =
         """
         \(preamble)
         \(macros)
         \\begin{document}
+        \(inputs)
         \(sectionsString)
         \\end{document}
         """
@@ -112,6 +133,6 @@ struct NoteBuilder {
             throw Error.cantCreateResultFile
         }
         
-        return (resultFile, sectionsWarnings)
+        return (resultFile, sectionsWarnings + inputsWarnings)
     }
 }
