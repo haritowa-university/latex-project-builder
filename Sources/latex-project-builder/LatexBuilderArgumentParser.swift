@@ -1,3 +1,10 @@
+//
+//  FileBuilder.swift
+//  latex-project-builder
+//
+//  Created by haritowa on 3/30/18.
+//
+
 import Utility
 
 enum Argument: String {
