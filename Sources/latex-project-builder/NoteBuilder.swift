@@ -32,7 +32,7 @@ struct NoteBuilder {
             return preambleURL
         }
         
-        return try FileBuilder.build(for: fileManager, sourceFile: preambleURL, postface: [URL(fileURLWithPath: customizationFilePath)])
+        return try FileBuilder.build(for: fileManager, sourceFile: preambleURL, sourceFilePathPrefix: "", postface: [URL(fileURLWithPath: customizationFilePath)])
     }
     
     private func getMacrosURL(for folder: URL) -> URL? {
@@ -55,25 +55,25 @@ struct NoteBuilder {
         return !isDirectory(input: input) && filename.hasPrefix("subsection_") && filename.hasSuffix(".tex")
     }
     
-    private func buildSection(at path: URL) throws -> URL {
+    private func buildSection(at path: URL, pathPrefix: String) throws -> URL {
         let contentURL = path.appendingPathComponent("content.tex")
         guard fileManager.fileExists(atPath: contentURL.path) else {
             throw Error.cantFindContentForSection(path)
         }
         
         let macrosURL = getMacrosURL(for: path)
-        let subsections = try fileManager.contentsOfDirectory(at: path, includingPropertiesForKeys: [.isDirectoryKey])
+        let subsections = try fileManager.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
             .filter(subsectionFileFilter)
         
-        return try FileBuilder.build(for: fileManager, sourceFile: contentURL, preface: [macrosURL].compactMap { $0 }, postface: subsections)
+        return try FileBuilder.build(for: fileManager, sourceFile: contentURL, sourceFilePathPrefix: pathPrefix, preface: [macrosURL].compactMap { $0 }, postface: subsections)
     }
     
-    private func buildSections(sectionsPath: URL) throws -> (compiledSections: [URL], warnings: [String]) {
+    private func buildSections(sectionsPath: URL, sectionsDirectory: String) throws -> (compiledSections: [URL], warnings: [String]) {
         guard fileManager.fileExists(atPath: sectionsPath.path) else {
             throw Error.sectionsFolderDoesNotExist
         }
         
-        let sections = try fileManager.contentsOfDirectory(at: sectionsPath, includingPropertiesForKeys: [.isDirectoryKey])
+        let sections = try fileManager.contentsOfDirectory(at: sectionsPath, includingPropertiesForKeys: nil)
             .filter(isDirectory)
         
         var warnings = [String]()
@@ -81,7 +81,7 @@ struct NoteBuilder {
         
         for section in sections {
             do {
-                try compiledSections.append(buildSection(at: section))
+                try compiledSections.append(buildSection(at: section, pathPrefix: "\(sectionsDirectory)/\(section.lastPathComponent)/"))
             } catch (Error.cantFindContentForSection) {
                 warnings.append("Skip \(section.lastPathComponent), can not find content.tex")
             }
@@ -118,7 +118,7 @@ struct NoteBuilder {
         let preamble = try FileBuilder.urlToInputMapper(for: generatePreamble(rootDirectory: rootDirectory, customizationFileName: preambleCustomizationFileName))
         let macros = getMacrosURL(for: rootDirectory).map(FileBuilder.urlToInputMapper) ?? ""
         
-        let (sections, sectionsWarnings) = try buildSections(sectionsPath: rootDirectory.appendingPathComponent(sectionsDirectory))
+        let (sections, sectionsWarnings) = try buildSections(sectionsPath: rootDirectory.appendingPathComponent(sectionsDirectory), sectionsDirectory: sectionsDirectory)
         let sectionsString = sections.map(compilledSectionUrlToInputMapper).reduce("") { "\($0)\n  \($1)" }
         
         let (inputs, inputsWarnings) = buildAdditionalInputs(rootDirectory: rootDirectory, inputs: additionalInputs)

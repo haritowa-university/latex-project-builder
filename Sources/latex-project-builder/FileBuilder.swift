@@ -26,16 +26,16 @@ struct FileBuilder {
         return { urlToInputMapper(prefix: prefix, url: $0) }
     }
     
-    private static func generateIncludeCommand(for fileManager: FileManager, url: URL) throws -> String {
+    private static func generateIncludeCommand(for fileManager: FileManager, url: URL, sourceFilePathPrefix: String) throws -> String {
         guard fileManager.fileExists(atPath: url.path) else { throw Error.accomodationNotFound(url: url) }
-        return urlToInputMapper(for: url)
+        return urlToInputMapper(prefix: sourceFilePathPrefix, url: url)
     }
     
-    static func build(for fileManager: FileManager, sourceFile: URL, preface: [URL] = [], postface: [URL] = []) throws -> URL {
+    static func build(for fileManager: FileManager, sourceFile: URL, sourceFilePathPrefix: String, preface: [URL] = [], postface: [URL] = []) throws -> URL {
         guard fileManager.fileExists(atPath: sourceFile.path) else { throw Error.sourceFileNotFound(url: sourceFile) }
         
-        let prefaceString = try preface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url)) }
-        let postfaceString = try postface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url)) }
+        let prefaceString = try preface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
+        let postfaceString = try postface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
         
         let originalContent = try String(contentsOf: sourceFile)
         let resultContent = "\(prefaceString)\n\(originalContent)\n\(postfaceString)"
