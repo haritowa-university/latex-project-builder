@@ -15,7 +15,7 @@ struct FileBuilder {
     }
     
     static func urlToInputMapper(prefix: String, url: URL) -> String {
-        return "\\input(\(prefix)\(url.lastPathComponent))"
+        return "\\input{\(prefix)\(url.lastPathComponent)}"
     }
     
     static func urlToInputMapper(for url: URL) -> String {
