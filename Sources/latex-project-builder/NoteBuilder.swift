@@ -65,7 +65,7 @@ struct NoteBuilder {
         let subsections = try fileManager.contentsOfDirectory(at: path, includingPropertiesForKeys: nil)
             .filter(subsectionFileFilter)
         
-        return try FileBuilder.build(for: fileManager, sourceFile: contentURL, sourceFilePathPrefix: pathPrefix, preface: [macrosURL].compactMap { $0 }, postface: subsections)
+        return try FileBuilder.build(for: fileManager, sourceFile: contentURL, sourceFilePathPrefix: pathPrefix, preface: [macrosURL].compactMap { $0 }, postface: subsections, postfaceShouldRelaxClearpage: true)
     }
     
     private func buildSections(sectionsPath: URL, sectionsDirectory: String) throws -> (compiledSections: [URL], warnings: [String]) {

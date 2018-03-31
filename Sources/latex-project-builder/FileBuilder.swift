@@ -31,11 +31,30 @@ struct FileBuilder {
         return urlToInputMapper(prefix: sourceFilePathPrefix, url: url)
     }
     
-    static func build(for fileManager: FileManager, sourceFile: URL, sourceFilePathPrefix: String, preface: [URL] = [], postface: [URL] = []) throws -> URL {
+    private static func relaxClearPage(for content: String) -> String {
+        guard !content.isEmpty else { return content }
+        return
+        """
+        \\begingroup
+        \\let\\clearpage\\relax
+        \(content)
+        \\endgroup
+        """
+    }
+    
+    static func build(for fileManager: FileManager, sourceFile: URL, sourceFilePathPrefix: String, preface: [URL] = [], postface: [URL] = [], prefaceShouldRelaxClearpage: Bool = false, postfaceShouldRelaxClearpage: Bool = false) throws -> URL {
         guard fileManager.fileExists(atPath: sourceFile.path) else { throw Error.sourceFileNotFound(url: sourceFile) }
         
-        let prefaceString = try preface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
-        let postfaceString = try postface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
+        var prefaceString = try preface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
+        var postfaceString = try postface.reduce("") { (acc, url) in acc + (try generateIncludeCommand(for: fileManager, url: url, sourceFilePathPrefix: sourceFilePathPrefix)) }
+        
+        if prefaceShouldRelaxClearpage {
+            prefaceString = FileBuilder.relaxClearPage(for: prefaceString)
+        }
+        
+        if postfaceShouldRelaxClearpage {
+            postfaceString = FileBuilder.relaxClearPage(for: postfaceString)
+        }
         
         let originalContent = try String(contentsOf: sourceFile)
         let resultContent = "\(prefaceString)\n\(originalContent)\n\(postfaceString)"
