@@ -44,10 +44,15 @@ struct NoteBuilder {
         return macrosURL
     }
     
+    private func isDirectory(input: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        _ = fileManager.fileExists(atPath: input.path, isDirectory: &isDirectory)
+        return isDirectory.boolValue
+    }
+    
     private func subsectionFileFilter(input: URL) throws -> Bool {
-        let isDirectory = try (input.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false)
         let filename = input.lastPathComponent
-        return !isDirectory && filename.hasPrefix("subsection_") && filename.hasSuffix(".tex")
+        return !isDirectory(input: input) && filename.hasPrefix("subsection_") && filename.hasSuffix(".tex")
     }
     
     private func buildSection(at path: URL) throws -> URL {
@@ -69,7 +74,7 @@ struct NoteBuilder {
         }
         
         let sections = try fileManager.contentsOfDirectory(at: sectionsPath, includingPropertiesForKeys: [.isDirectoryKey])
-            .filter { try $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory ?? false }
+            .filter(isDirectory)
         
         var warnings = [String]()
         var compiledSections = [URL]()
