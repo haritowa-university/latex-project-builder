@@ -34,12 +34,12 @@ struct FileBuilder {
     private static func relaxClearPage(for content: String) -> String {
         guard !content.isEmpty else { return content }
         return
-        """
-        \\begingroup
-        \\let\\clearpage\\relax
-        \(content)
-        \\endgroup
-        """
+            """
+            \\begingroup
+            \\let\\clearpage\\relax
+            \(content)
+            \\endgroup
+            """
     }
     
     static func build(for fileManager: FileManager, sourceFile: URL, sourceFilePathPrefix: String, preface: [URL] = [], postface: [URL] = [], prefaceShouldRelaxClearpage: Bool = false, postfaceShouldRelaxClearpage: Bool = false) throws -> URL {
