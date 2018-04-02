@@ -19,12 +19,8 @@ let result = try NoteBuilder(fileManager: .default).build(
     additionalInputs: parser.get(for: .additionalInputs)
 )
 
-print("Result is located at \(result.result.path)")
-
-if let stdout = stdoutStream as? LocalFileOutputByteStream {
-    let tc = TerminalController(stream: stdout)
-
-    for warning in result.warnings {
-        tc?.write("[WARNING]: \(warning) \n", inColor: .yellow)
-    }
+for warning in result.warnings {
+    print("[WARNING]: \(warning)")
 }
+
+print("Result is located at \(result.result.path)")
