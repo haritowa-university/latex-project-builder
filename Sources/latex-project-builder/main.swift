@@ -16,7 +16,8 @@ let result = try NoteBuilder(fileManager: .default).build(
     rootDirectory: URL(fileURLWithPath: parser.get(for: .rootDirectory)),
     sectionsDirectory: parser.get(for: .relativeSectionsDirectory),
     preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath),
-    additionalInputs: parser.get(for: .additionalInputs)
+    additionalInputs: parser.get(for: .additionalInputs),
+    bibliographyFile: parser.get(for: .bibtexLibraryPath)
 )
 
 for warning in result.warnings {

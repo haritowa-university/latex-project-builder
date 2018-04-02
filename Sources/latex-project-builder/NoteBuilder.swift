@@ -114,7 +114,7 @@ struct NoteBuilder {
         return (result, warnings)
     }
     
-    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String, additionalInputs: [String]) throws -> (result: URL, warnings: [String]) {
+    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String, additionalInputs: [String], bibliographyFile: String) throws -> (result: URL, warnings: [String]) {
         let preamble = try FileBuilder.urlToInputMapper(for: generatePreamble(rootDirectory: rootDirectory, customizationFileName: preambleCustomizationFileName))
         let macros = getMacrosURL(for: rootDirectory).map(FileBuilder.urlToInputMapper) ?? ""
         
@@ -130,6 +130,9 @@ struct NoteBuilder {
         \\begin{document}
         \(inputs)
         \(sectionsString)
+        
+        \\bibliography{\(bibliographyFile)}
+        
         \\end{document}
         """
         

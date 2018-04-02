@@ -12,6 +12,7 @@ enum Argument: String {
     case relativeSectionsDirectory // Relative to root
     case preambleCustomizationsPath
     case additionalInputs // Input latex files, that goes before sections
+    case bibtexLibraryPath
     
     var name: String {
         return "--\(self.rawValue)"
@@ -25,6 +26,7 @@ enum Argument: String {
         case .relativeSectionsDirectory: result = "-s"
         case .preambleCustomizationsPath: result = "-p"
         case .additionalInputs: result = "-i"
+        case .bibtexLibraryPath: result = "-b"
         }
         
         return result
@@ -38,6 +40,7 @@ enum Argument: String {
         case .relativeSectionsDirectory: result = "Sections directory inside root directory(sections by default)"
         case .preambleCustomizationsPath: result = "Preamble customization file inside root directory(preamble-customization.tex by default)"
         case .additionalInputs: result = "Additional input files, that goes before sections, default are: title, abstract, table_of_contents, abbreviations"
+        case .bibtexLibraryPath: result = "BibTex library file path"
         }
         
         return result
@@ -45,7 +48,7 @@ enum Argument: String {
     
     var completion: ShellCompletion? {
         switch self {
-        case .preambleCustomizationsPath: return .filename
+        case .preambleCustomizationsPath, .bibtexLibraryPath: return .filename
         default: return nil
         }
     }
@@ -58,6 +61,7 @@ final class LatexBuilderArgumentParser {
     private let relativeSectionsDirectoryParameter: OptionArgument<String>
     private let preambleCustomizationsPathParameter: OptionArgument<String>
     private let additionalInputsParameter: OptionArgument<[String]>
+    private let bibtexLibraryPathParameter: OptionArgument<String>
     
     private var result: ArgumentParser.Result?
     
@@ -88,6 +92,7 @@ final class LatexBuilderArgumentParser {
         relativeSectionsDirectoryParameter = LatexBuilderArgumentParser.add(argument: .relativeSectionsDirectory, parser: argumentParser)
         preambleCustomizationsPathParameter = LatexBuilderArgumentParser.add(argument: .preambleCustomizationsPath, parser: argumentParser)
         additionalInputsParameter = LatexBuilderArgumentParser.add(argument: .additionalInputs, parser: argumentParser)
+        bibtexLibraryPathParameter = LatexBuilderArgumentParser.add(argument: .bibtexLibraryPath, parser: argumentParser)
     }
     
     func parse(args: [String]) throws {
@@ -106,6 +111,7 @@ final class LatexBuilderArgumentParser {
         case .rootDirectory: return result.get(rootDirectoryParameter) ?? "tex"
         case .preambleCustomizationsPath: return result.get(preambleCustomizationsPathParameter) ?? "preamble-customization.tex"
         case .relativeSectionsDirectory: return result.get(relativeSectionsDirectoryParameter) ?? "sections"
+        case .bibtexLibraryPath: return result.get(bibtexLibraryPathParameter) ?? "bibliography_database"
         default: fatalError("User get(for:) -> [String]? for additionalInputs parameters")
         }
     }
@@ -115,7 +121,7 @@ final class LatexBuilderArgumentParser {
         
         switch argument {
         case .additionalInputs: return result.get(additionalInputsParameter) ?? ["title", "abstract", "table_of_contents", "abbreviations"]
-        default: fatalError("User get(for:) -> String? for \(argument.name) parameters")
+        default: fatalError("User get(for:) -> String? for \(argument.name) parameter")
         }
     }
 }
