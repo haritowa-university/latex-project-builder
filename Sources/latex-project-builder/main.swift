@@ -16,15 +16,12 @@ let result = try NoteBuilder(fileManager: .default).build(
     rootDirectory: URL(fileURLWithPath: parser.get(for: .rootDirectory)),
     sectionsDirectory: parser.get(for: .relativeSectionsDirectory),
     preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath),
-    additionalInputs: parser.get(for: .additionalInputs)
+    additionalInputs: parser.get(for: .additionalInputs),
+    bibliographyFile: parser.get(for: .bibtexLibraryPath)
 )
 
-print("Result is located at \(result.result.path)")
-
-if let stdout = stdoutStream as? LocalFileOutputByteStream {
-    let tc = TerminalController(stream: stdout)
-
-    for warning in result.warnings {
-        tc?.write("[WARNING]: \(warning) \n", inColor: .yellow)
-    }
+for warning in result.warnings {
+    print("[WARNING]: \(warning)")
 }
+
+print("Result is located at \(result.result.path)")
