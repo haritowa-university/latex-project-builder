@@ -17,6 +17,7 @@ let result = try NoteBuilder(fileManager: .default).build(
     sectionsDirectory: parser.get(for: .relativeSectionsDirectory),
     preambleCustomizationFileName: parser.get(for: .preambleCustomizationsPath),
     additionalInputs: parser.get(for: .additionalInputs),
+    additionalInputsAfterBib: parser.get(for: .additionalInputsAfterBib),
     bibliographyFile: parser.get(for: .bibtexLibraryPath)
 )
 

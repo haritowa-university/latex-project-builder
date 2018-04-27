@@ -114,7 +114,7 @@ struct NoteBuilder {
         return (result, warnings)
     }
     
-    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String, additionalInputs: [String], bibliographyFile: String) throws -> (result: URL, warnings: [String]) {
+    func build(rootDirectory: URL, sectionsDirectory: String, preambleCustomizationFileName: String, additionalInputs: [String], additionalInputsAfterBib: [String], bibliographyFile: String) throws -> (result: URL, warnings: [String]) {
         let preamble = try FileBuilder.urlToInputMapper(for: generatePreamble(rootDirectory: rootDirectory, customizationFileName: preambleCustomizationFileName))
         let macros = getMacrosURL(for: rootDirectory).map(FileBuilder.urlToInputMapper) ?? ""
         
@@ -122,6 +122,7 @@ struct NoteBuilder {
         let sectionsString = sections.map(compilledSectionUrlToInputMapper).reduce("") { "\($0)\n  \($1)" }
         
         let (inputs, inputsWarnings) = buildAdditionalInputs(rootDirectory: rootDirectory, inputs: additionalInputs)
+        let (inputsAfter, inputsAfterWarnings) = buildAdditionalInputs(rootDirectory: rootDirectory, inputs: additionalInputsAfterBib)
         
         let document =
         """
@@ -133,6 +134,7 @@ struct NoteBuilder {
         \(sectionsString)
         
         \\printbibliography[title = {СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}]
+        \(inputsAfter)
         
         \\end{document}
         """
@@ -142,6 +144,6 @@ struct NoteBuilder {
             throw Error.cantCreateResultFile
         }
         
-        return (resultFile, sectionsWarnings + inputsWarnings)
+        return (resultFile, sectionsWarnings + inputsWarnings + inputsAfterWarnings)
     }
 }

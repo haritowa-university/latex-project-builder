@@ -13,6 +13,7 @@ enum Argument: String {
     case preambleCustomizationsPath
     case additionalInputs // Input latex files, that goes before sections
     case bibtexLibraryPath
+    case additionalInputsAfterBib
     
     var name: String {
         return "--\(self.rawValue)"
@@ -27,6 +28,7 @@ enum Argument: String {
         case .preambleCustomizationsPath: result = "-p"
         case .additionalInputs: result = "-i"
         case .bibtexLibraryPath: result = "-b"
+        case .additionalInputsAfterBib: result = "-z"
         }
         
         return result
@@ -41,6 +43,7 @@ enum Argument: String {
         case .preambleCustomizationsPath: result = "Preamble customization file inside root directory(preamble-customization.tex by default)"
         case .additionalInputs: result = "Additional input files, that goes before sections, default are: title, abstract, table_of_contents, abbreviations"
         case .bibtexLibraryPath: result = "BibTex library file path"
+        case .additionalInputsAfterBib: result = "Additional inputs after bibliography"
         }
         
         return result
@@ -61,6 +64,7 @@ final class LatexBuilderArgumentParser {
     private let relativeSectionsDirectoryParameter: OptionArgument<String>
     private let preambleCustomizationsPathParameter: OptionArgument<String>
     private let additionalInputsParameter: OptionArgument<[String]>
+    private let additionalInputsAfterBibParameter: OptionArgument<[String]>
     private let bibtexLibraryPathParameter: OptionArgument<String>
     
     private var result: ArgumentParser.Result?
@@ -92,6 +96,7 @@ final class LatexBuilderArgumentParser {
         relativeSectionsDirectoryParameter = LatexBuilderArgumentParser.add(argument: .relativeSectionsDirectory, parser: argumentParser)
         preambleCustomizationsPathParameter = LatexBuilderArgumentParser.add(argument: .preambleCustomizationsPath, parser: argumentParser)
         additionalInputsParameter = LatexBuilderArgumentParser.add(argument: .additionalInputs, parser: argumentParser)
+        additionalInputsAfterBibParameter = LatexBuilderArgumentParser.add(argument: .additionalInputsAfterBib, parser: argumentParser)
         bibtexLibraryPathParameter = LatexBuilderArgumentParser.add(argument: .bibtexLibraryPath, parser: argumentParser)
     }
     
@@ -121,6 +126,7 @@ final class LatexBuilderArgumentParser {
         
         switch argument {
         case .additionalInputs: return result.get(additionalInputsParameter) ?? ["title", "abstract", "table_of_contents", "abbreviations"]
+        case .additionalInputsAfterBib: return result.get(additionalInputsAfterBibParameter) ?? ["appendices"]
         default: fatalError("User get(for:) -> String? for \(argument.name) parameter")
         }
     }
