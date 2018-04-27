@@ -127,11 +127,12 @@ struct NoteBuilder {
         """
         \(preamble)
         \(macros)
+        \\addbibresource{\(bibliographyFile)}
         \\begin{document}
         \(inputs)
         \(sectionsString)
         
-        \\bibliography{\(bibliographyFile)}
+        \\printbibliography[title = {СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}]
         
         \\end{document}
         """
