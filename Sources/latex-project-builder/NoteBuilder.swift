@@ -128,12 +128,20 @@ struct NoteBuilder {
         """
         \(preamble)
         \(macros)
-        \\addbibresource{\(bibliographyFile)}
         \\begin{document}
         \(inputs)
         \(sectionsString)
+
+        \\renewcommand{\\bibsection}{\\sectioncentered*{Cписок использованных источников}}
+        \\phantomsection\\pagebreak
+        \\addcontentsline{toc}{section}{Cписок использованных источников}
+
+        \\nocite{*}
+
+        \\bibliography{\(bibliographyFile)}
+
+        \\newpage
         
-        \\printbibliography[title = {СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ}]
         \(inputsAfter)
         
         \\end{document}
